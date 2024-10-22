@@ -13,7 +13,7 @@ class ProductionConfig(Config):
     DEBUG = True
     MONGODB_SETTINGS = {
         "host": os.environ.get("MONGO_HOST"),
-        "port": int(os.environ.get("MONGO_PORT")),
+        "port": int(os.environ.get("MONGO_PORT", 27017)),
         "username": os.environ.get("MONGO_USERNAME"),
         "password": os.environ.get("MONGO_PASSWORD"),
     }

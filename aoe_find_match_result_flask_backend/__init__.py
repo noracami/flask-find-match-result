@@ -49,7 +49,7 @@ def matches():
     if request.method == "POST":
         create_match()
     elif request.method == "GET":
-        pass
+        get_all_matches()
 
 
 def create_match():
