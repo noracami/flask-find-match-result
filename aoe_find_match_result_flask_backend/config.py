@@ -12,8 +12,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = True
     MONGODB_SETTINGS = {
-        "host": os.environ.get("MONGODB_HOST"),
-        "port": os.environ.get("MONGODB_PORT"),
-        "username": os.environ.get("MONGODB_USERNAME"),
-        "password": os.environ.get("MONGODB_PASSWORD"),
+        "host": os.environ.get("MONGO_HOST"),
+        "port": os.environ.get("MONGO_PORT"),
+        "username": os.environ.get("MONGO_USERNAME"),
+        "password": os.environ.get("MONGO_PASSWORD"),
     }
