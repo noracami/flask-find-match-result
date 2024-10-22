@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, request
 from .config import DevelopmentConfig, ProductionConfig
 from .database import mongo_client
 
@@ -38,3 +38,45 @@ def visits():
     # to get the visits count
     count = mongo_client.aoe_find_match_result.visits.find_one({"_id": "visits"})
     return f"Total visits: {count['count']}"
+
+
+# POST /matches => create a new match
+# GET /matches => get all matches
+@app.route("/api/v1/matches", methods=["POST", "GET"])
+def matches():
+    if request.method == "POST":
+        create_match()
+    elif request.method == "GET":
+        pass
+
+
+def create_match():
+    match = request.json
+    mongo_client.aoe_find_match_result.matches.insert_one(
+        {"_id": match["matchId"], **match}
+    )
+    return "Match created successfully", 201
+
+
+def get_all_matches():
+    # 1. get all matches
+    # 2. group by match_id
+    # 3. take the latest match (the one with the highest timestamp)
+    matches = mongo_client.aoe_find_match_result.matches.aggregate(
+        [{"$group": {"_id": "$matchId", "latest_match": {"$max": "$timestamp"}}}]
+    )
+    return matches, 200
+
+
+# GET /matches/<id> => get a single match
+@app.route("/api/v1/matches/<id>")
+def get_match(id):
+    # 1. get matches by match_id
+    # 2. sort by timestamp
+    # 3. get the latest match (the one with the highest timestamp)
+    match = (
+        mongo_client.aoe_find_match_result.matches.find({"matchId": id})
+        .sort("timestamp", -1)
+        .limit(1)
+    )
+    return match, 200
