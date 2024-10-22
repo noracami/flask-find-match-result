@@ -76,9 +76,7 @@ def get_match(id):
     # 1. get matches by match_id
     # 2. sort by timestamp
     # 3. get the latest match (the one with the highest timestamp)
-    match = (
-        mongo_client.aoe_find_match_result.matches.find({"matchId": id})
-        .sort("timestamp", -1)
-        .limit(1)
-    )
+    match = mongo_client.aoe_find_match_result.matches.find({"matchId": id}).sort(
+        "timestamp", -1
+    )[0]
     return {"match": match}, 200
