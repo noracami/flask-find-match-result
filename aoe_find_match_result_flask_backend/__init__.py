@@ -67,6 +67,9 @@ def get_all_matches():
     matches = mongo_client.aoe_find_match_result.matches.aggregate(
         [{"$group": {"_id": "$matchId", "latest_match": {"$max": "$timestamp"}}}]
     )
+    # delete the _id field since it's not JSON serializable
+    for match in matches:
+        match.pop("_id")
     return {"matches": list(matches)}, 200
 
 
@@ -82,4 +85,7 @@ def get_match(id):
     match = mongo_client.aoe_find_match_result.matches.find({"matchId": int(id)}).sort(
         "timestamp", -1
     )[0]
+
+    # delete the _id field since it's not JSON serializable
+    match.pop("_id")
     return {"match": match}, 200
