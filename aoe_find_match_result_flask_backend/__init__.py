@@ -54,9 +54,9 @@ def matches():
 
 def create_match():
     match = request.json
-    mongo_client.aoe_find_match_result.matches.insert_one(
-        {"_id": match["matchId"], **match}
-    )
+    mongo_client.aoe_find_match_result.matches.insert_one(match)
+    # create index on matchId if not exists
+    mongo_client.aoe_find_match_result.matches.create_index("matchId", unique=False)
     return "Match created successfully", 201
 
 
