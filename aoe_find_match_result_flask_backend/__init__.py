@@ -47,9 +47,9 @@ def visits():
 @app.route("/api/v1/matches", methods=["POST", "GET"])
 def matches():
     if request.method == "POST":
-        create_match()
+        return create_match()
     elif request.method == "GET":
-        get_all_matches()
+        return get_all_matches()
 
 
 def create_match():
