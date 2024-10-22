@@ -1,10 +1,12 @@
 import os
 from flask import Flask, request
+from flask_cors import CORS
 from .config import DevelopmentConfig, ProductionConfig
 from .database import mongo_client
 
 
 app = Flask(__name__)
+CORS(app)
 
 if app.config is None:
     if os.environ.get("FLASK_ENV") == "development":
