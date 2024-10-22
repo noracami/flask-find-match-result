@@ -57,7 +57,7 @@ def create_match():
     mongo_client.aoe_find_match_result.matches.insert_one(match)
     # create index on matchId if not exists
     mongo_client.aoe_find_match_result.matches.create_index("matchId", unique=False)
-    return "Match created successfully", 201
+    return {"message": "Match created successfully"}, 201
 
 
 def get_all_matches():
@@ -67,7 +67,7 @@ def get_all_matches():
     matches = mongo_client.aoe_find_match_result.matches.aggregate(
         [{"$group": {"_id": "$matchId", "latest_match": {"$max": "$timestamp"}}}]
     )
-    return matches, 200
+    return {"matches": list(matches)}, 200
 
 
 # GET /matches/<id> => get a single match
@@ -81,4 +81,4 @@ def get_match(id):
         .sort("timestamp", -1)
         .limit(1)
     )
-    return match, 200
+    return {"match": match}, 200
