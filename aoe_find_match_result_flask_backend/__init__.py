@@ -3,7 +3,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from .config import DevelopmentConfig, ProductionConfig
 from .database import mongo_client
-
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 CORS(app)
@@ -54,6 +54,12 @@ def matches():
 
 def create_match():
     match = request.json
+    # query for the matchId and finished fields, if it exists, do not insert, return 200
+    if mongo_client.aoe_find_match_result.matches.find_one(
+        {"matchId": match["matchId"], "finished": match["finished"]}
+    ):
+        return {"message": "Match already exists"}, 200
+
     mongo_client.aoe_find_match_result.matches.insert_one(match)
     # create index on matchId if not exists
     mongo_client.aoe_find_match_result.matches.create_index("matchId", unique=False)
@@ -61,16 +67,22 @@ def create_match():
 
 
 def get_all_matches():
-    # 1. get all matches
-    # 2. group by match_id
-    # 3. take the latest match (the one with the highest timestamp)
-    matches = mongo_client.aoe_find_match_result.matches.aggregate(
-        [{"$group": {"_id": "$matchId", "latest_match": {"$max": "$timestamp"}}}]
-    )
-    # delete the _id field since it's not JSON serializable
+    matches = list(mongo_client.aoe_find_match_result.matches.find())
     for match in matches:
-        match.pop("_id")
-    return {"matches": list(matches)}, 200
+        match["_id"] = str(match["_id"])
+
+    return {"matches": matches}, 200
+
+    # # 1. get all matches
+    # # 2. group by match_id
+    # # 3. take the latest match (the one with the highest timestamp)
+    # matches = mongo_client.aoe_find_match_result.matches.aggregate(
+    #     [{"$group": {"_id": "$matchId", "latest_match": {"$max": "$timestamp"}}}]
+    # )
+    # # delete the _id field since it's not JSON serializable
+    # for match in matches:
+    #     match.pop("_id")
+    # return {"matches": list(matches)}, 200
 
 
 # GET /matches/<id> => get a single match

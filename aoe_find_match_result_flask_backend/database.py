@@ -16,7 +16,13 @@ class MongoDB:
                 server_api=ServerApi("1"),
             )
         else:
-            self.client = None
+            self.client = MongoClient(
+                os.getenv(
+                    "MONGODB_URI",
+                    "",
+                ),
+                server_api=ServerApi("1"),
+            )
 
     def get_client(self):
         return self.client
